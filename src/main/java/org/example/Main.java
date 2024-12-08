@@ -26,25 +26,25 @@ public class Main {
         };
 
         int[][] environment = new int[width][width];
-        int counter = 0;
-        if(!run(startPoint, action, environment, counter)){
+        int offset = 0;
+        if(!run(startPoint, action, environment, move, offset)){
             System.out.println("Not found");
         }
 
     }
 
-    public static boolean run(int[] startPoint,int[][] action,int[][] environment, int counter){
-        counter++;
-        if (counter > 64) {
-            for (int i = 0; i < width; i++)
-                for (int j = 0; j < width; j++)
-                    environment[i][j] = 0;
-            return false;
+    public static boolean run(int[] startPoint,int[][] action,int[][] environment, int[][] moves, int offset){
+        offset++;
+        if (offset < width*width){
+            moves[0][offset] = startPoint[0];
+            moves[1][offset] = startPoint[1];
         }
 
+
         if (checkGoalState(environment)){
-            System.out.println("Finish");
-            System.out.println(Arrays.deepToString(environment));
+            System.out.println("Finished with below moves ");
+            System.out.println(Arrays.toString(moves[0]));
+            System.out.println(Arrays.toString(moves[1]));
             return true;
         }
 
@@ -59,9 +59,15 @@ public class Main {
 
         for (int[] move : nextMove)
             if (moveAction(startPoint, move, environment)) {
-                if (run(startPoint, action, environment, counter))
+                if (run(startPoint, action, environment, moves, offset))
                     return true;
                 popAction(startPoint, move, environment);
+                if (offset > 0) {
+                    moves[0][offset] = -1;
+                    moves[1][offset] = -1;
+                    offset--;
+                }
+
             }
 
 
