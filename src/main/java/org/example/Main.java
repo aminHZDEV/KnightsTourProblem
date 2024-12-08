@@ -74,9 +74,10 @@ public class Main {
     }
 
     public static void popAction(int[] point, int[] action,int[][] environment){
+        environment[point[0]][point[1]] = 0;
         point[0] -= action[0];
         point[1] -= action[1];
-        environment[point[0]][point[1]] = 0;
+
 
     }
 
