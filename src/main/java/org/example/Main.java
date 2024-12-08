@@ -41,16 +41,27 @@ public class Main {
                     environment[i][j] = 0;
             return false;
         }
+
         if (checkGoalState(environment)){
             System.out.println("Finish");
             System.out.println(Arrays.deepToString(environment));
             return true;
         }
 
-        for(int i=0 ; i <width; i++)
-            if(moveAction(startPoint, action[i], environment)){
-                run(startPoint, action, environment, counter);
-                popAction(startPoint, action[i], environment);
+        int[][] nextMove = new int[8][3]; // Format: {moveX, moveY, onwardMovesCount}
+        for (int i = 0; i < 8; i++) {
+            nextMove[i][0] = action[i][0];
+            nextMove[i][1] = action[i][1];
+            nextMove[i][2] = warnsdorfsRule(new int[]{startPoint[0] + action[i][0], startPoint[1] + action[i][1]}, environment, action);
+        }
+
+        Arrays.sort(nextMove, (a, b) -> Integer.compare(a[2], b[2]));
+
+        for (int[] move : nextMove)
+            if (moveAction(startPoint, move, environment)) {
+                if (run(startPoint, action, environment, counter))
+                    return true;
+                popAction(startPoint, move, environment);
             }
 
 
@@ -77,15 +88,12 @@ public class Main {
         environment[point[0]][point[1]] = 0;
         point[0] -= action[0];
         point[1] -= action[1];
-
-
     }
 
     public static boolean outsideEnvConstraint(int[] point, int[] action){
         return  (point[0] + action[0]) < width && (point[1] + action[1]) < width &&
                     (point[0] + action[0]) >= 0 && (point[1] + action[1]) >= 0;
     }
-
 
 
 
@@ -101,4 +109,17 @@ public class Main {
     public static boolean checkMoveConstraints(int[][] environment,int[] point,  int[] move){
         return environment[point[0]+move[0]][point[1]+move[1]] == 0;
     }
+
+    /*
+    add below function by read https://en.wikipedia.org/wiki/Knight%27s_tour reference
+    */
+
+    public static int warnsdorfsRule(int[] point, int[][] environment, int[][] action){
+        int count = 0;
+        for (int[] item : action)
+            if (outsideEnvConstraint(new int[]{point[0], point[1]}, item) && environment[point[0] + item[0]][point[1] + item[1]] == 0)
+                count++;
+        return count;
+    }
+
 }
